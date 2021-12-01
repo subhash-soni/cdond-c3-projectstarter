@@ -129,7 +129,7 @@ jobs:
               --tags project=Project3-udacity \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
-              exit 1
+            exit 1
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -138,7 +138,7 @@ jobs:
               #--tags project=your-tag \
               # --stack-name "your front-end stack name with workflow id" \
               # --parameter-overrides ID="your workflow id"  
-              exit 1
+            exit 1
       - run:
           name: Add back-end ip to ansible inventory
           working_directory: ./.circleci/ansible
