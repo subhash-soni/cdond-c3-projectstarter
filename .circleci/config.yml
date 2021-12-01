@@ -6,9 +6,9 @@ commands:
     parameters:
       # Add parameter here
       id : 
-      type : string   
+        type : string   
       cond :
-      type : string 
+        type : string 
     steps:
       - run:
           name: Destroy environments - Backend
