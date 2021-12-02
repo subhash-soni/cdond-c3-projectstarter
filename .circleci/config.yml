@@ -152,12 +152,12 @@ jobs:
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
           # exit 1
       - run:
-          name: Add back-end ip to ansible inventory
-          working_directory: ./.circleci/ansible
+          name: Add back-end EC2 ip to ansible inventory
           command: |
+            cd .circleci/ansible
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --filters Name=instance-state-name, Values="udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text >> inventory.txt
             cat inventory.txt
           # exit 1
@@ -191,9 +191,9 @@ jobs:
           at: /tmp/workspace
       - run:
           name: Install dependencies
-          working_directory: ./.circleci/ansible
           # Your code here
           command: |
+            cd .circleci/ansible
             sudo add-apt-repository ppa:ansible/ansible
             sudo apt-get update
             sudo apt install ansible
@@ -201,9 +201,9 @@ jobs:
           # exit 1
       - run:
           name: Configure server
-          working_directory: ./.circleci/ansible
           # Your code here
           command: |
+            cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
           # exit 1
           # Here's where you will add some code to rollback on failure 
