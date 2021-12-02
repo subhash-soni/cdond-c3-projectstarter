@@ -168,7 +168,48 @@ jobs:
       # Here's where you will add some code to rollback on failure  
       - destroy-environment:
            id: ${CIRCLE_WORKFLOW_ID:0:7}
-           cond: on_fail        
+           cond: on_fail    
+  
+  configure-infrastructure: 
+    docker:
+      # Docker image here that supports Ansible - Should have Python for Woking as Control Node
+      # https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements
+      - image: cimg/python:3.10.0
+     
+    steps:
+      # Checkout code from git
+      - checkout  
+      - run: python --version
+    steps:   
+      # Add ssh keys with fingerprint  --> https://circleci.com/docs/2.0/add-ssh-key/#adding-ssh-keys-to-a-job
+      - add_ssh_keys:
+          fingerprints:
+            - "13:1d:dd:c2:44:52:ea:22:c2:59:61:79:af:00:27:08"
+    steps:
+      # attach workspace refer -> https://circleci.com/docs/2.0/configuration-reference/#attachworkspace
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Install dependencies
+          working_directory: ./.circleci/ansible
+          # Your code here
+          command: |
+            add-apt-repository ppa:ansible/ansible
+            apt-get update
+            apt install ansible
+            ansible --version
+          # exit 1
+      - run:
+          name: Configure server
+          working_directory: ./.circleci/ansible
+          # Your code here
+          command: |
+            ansible-playbook -i inventory.txt configure-server.yaml
+          # exit 1
+          # Here's where you will add some code to rollback on failure 
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail                   
   
 workflows:
   default:
@@ -188,3 +229,6 @@ workflows:
           filters:
             branches:
               only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+                    
