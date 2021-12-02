@@ -194,10 +194,10 @@ jobs:
           working_directory: ./.circleci/ansible
           # Your code here
           command: |
-            add-apt-repository ppa:ansible/ansible
-            apt-get update
-            apt install ansible
-            ansible --version
+            sudo add-apt-repository ppa:ansible/ansible
+            sudo apt-get update
+            sudo apt install ansible
+            sudo ansible --version
           # exit 1
       - run:
           name: Configure server
