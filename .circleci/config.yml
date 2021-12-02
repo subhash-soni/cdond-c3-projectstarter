@@ -180,12 +180,12 @@ jobs:
       # Checkout code from git
       - checkout  
       - run: python --version
-    steps:   
+      
       # Add ssh keys with fingerprint  --> https://circleci.com/docs/2.0/add-ssh-key/#adding-ssh-keys-to-a-job
       - add_ssh_keys:
           fingerprints:
             - "13:1d:dd:c2:44:52:ea:22:c2:59:61:79:af:00:27:08"
-    steps:
+    
       # attach workspace refer -> https://circleci.com/docs/2.0/configuration-reference/#attachworkspace
       - attach_workspace:
           at: /tmp/workspace
