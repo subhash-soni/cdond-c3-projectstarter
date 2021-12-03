@@ -164,7 +164,7 @@ jobs:
             cat inventory.txt
           # exit 1
       - persist_to_workspace:
-          root: ~/tmp/workspace
+          root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure  
@@ -190,7 +190,7 @@ jobs:
     
       # attach workspace refer -> https://circleci.com/docs/2.0/configuration-reference/#attachworkspace
       - attach_workspace:
-          at: /tmp/workspace
+          at: ~/
       - run:
           name: Install dependencies
           # Your code here
