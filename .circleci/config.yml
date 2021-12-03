@@ -153,6 +153,8 @@ jobs:
           # exit 1
       - run:
           name: Add back-end EC2 ip to ansible inventory
+          # Refer to https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html 
+          # check explanation for 'tag:<key>'
           command: |
             cd .circleci/ansible
             aws ec2 describe-instances \
@@ -162,7 +164,7 @@ jobs:
             cat inventory.txt
           # exit 1
       - persist_to_workspace:
-          root: ~/
+          root: /tmp/workspace
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure  
@@ -173,7 +175,7 @@ jobs:
   configure-infrastructure: 
     docker:
       # Docker image here that supports Ansible - Should have Python for Woking as Control Node
-      # https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements
+      # refer https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements
       - image: cimg/python:3.10.0
      
     steps:
