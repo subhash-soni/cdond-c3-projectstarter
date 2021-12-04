@@ -305,14 +305,15 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - attach_workspace:
-          at: ~/
+      
       - restore_cache:
           keys: [frontend-build]
       - run: 
           name: Installing tar gzip
           command: |
-             yum install -y tar gzip      
+             yum install -y tar gzip    
+      - attach_workspace:
+          at: ~/         
       - run:
           name: Install dependencies - Python
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
@@ -397,11 +398,6 @@ jobs:
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
              sudo apt-get install zip gzip tar
-      - run: 
-          name: Installing tar gzip
-          command: |
-             yum install -y tar gzip 
-
       - run:
           name: Install dependencies - Nodejs, NPM
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
