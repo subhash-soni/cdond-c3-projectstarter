@@ -310,6 +310,7 @@ jobs:
       - run: 
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
+            apt-get install sudo -y
             sudo apt-get install zip gzip tar
       - attach_workspace:
           at: ~/
@@ -401,18 +402,19 @@ jobs:
           command: |
              sudo apt-get install zip gzip tar
       - run:
-          name: Install dependencies - Nodejs
+          name: Install dependencies - Nodejs, NPM
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
             cd backend
-            sudo apt install nodejs       
+            sudo apt install nodejs 
+            sudo apt-get install -y npm       
           # your code here
-      - run:
-          name: Install dependencies - NPM
-          # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
-          command: |
-            cd backend
-            npm install    
+      # - run:
+      #     name: Install dependencies - NPM
+      #     # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
+      #     command: |
+      #       cd backend
+      #       sudo apt-get install -y npm    
       - run:
           name: Deploy backend
           # your code here
