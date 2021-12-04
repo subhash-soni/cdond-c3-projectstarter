@@ -3,6 +3,7 @@
     unarchive:  
       src: artifact.tar.gz
       dest: /usr/local/bin/
+      remote_src: no
  
   - name: "update apt packages."
     become: true
