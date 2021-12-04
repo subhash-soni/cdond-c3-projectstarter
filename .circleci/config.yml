@@ -226,6 +226,12 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run: 
+          name: Install python 3 as below AWS CLI version is failing with python 2.7    
+          command: |
+            sudo apt-get update
+            sudo apt-get install python 
+            python --version
+      - run: 
           name: Install awscli else destroy-environment job keep failing!
           command: |
             curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
