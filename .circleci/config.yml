@@ -264,9 +264,10 @@ jobs:
             cd backend
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl -H "Content-Type: text/plain" -H "token: 7933fe63-4687-4fa1-8426-aa25aa1730ec" \
+              curl -H "Content-Type: text/plain" -H "token: f77a911e-0add-4ba5-ae19-b5c5ff2df0a8" \
               --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
             fi
+              
           # exit 1       
       # Here's where you will add some code to rollback on failure   
       - destroy-environment:
@@ -294,9 +295,9 @@ jobs:
           name: Install dependencies - AWSCLI
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
-            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-            unzip awscli-bundle.zip
-            sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       
       - run:
           name: Install dependencies - NPM
@@ -419,5 +420,9 @@ workflows:
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
-          requires: [configure-infrastructure]    
+          requires: [configure-infrastructure]   
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
                     
