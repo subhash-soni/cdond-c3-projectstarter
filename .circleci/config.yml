@@ -229,7 +229,8 @@ jobs:
           name: Install python 3 as below AWS CLI version is failing with python 2.7    
           command: |
             sudo apt-get update
-            sudo apt-get install python 
+            sudo apt-get install python3.8 
+            
             python --version
       - run: 
           name: Install awscli else destroy-environment job keep failing!
