@@ -305,15 +305,14 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - attach_workspace:
+          at: ~/
       - restore_cache:
           keys: [frontend-build]
       - run: 
-          name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
+          name: Installing tar gzip
           command: |
-            apt-get install sudo -y
-            sudo apt-get install zip gzip tar
-      - attach_workspace:
-          at: ~/
+             yum install -y tar gzip      
       - run:
           name: Install dependencies - Python
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
@@ -329,12 +328,8 @@ jobs:
           command: |
             cd frontend
             sudo apt install nodejs
-      - run:
-          name: Install dependencies - NPM
-          # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
-          command: |
-            cd frontend
-            npm install      
+            sudo apt-get install -y npm   
+          
       - run:
           name: Get backend url
           # your code here - Copied ec2 describe code from Deploy Infrastructure!
@@ -367,22 +362,22 @@ jobs:
           cond: on_fail    
 
   deploy-backend:
-    docker:
-      # Docker image here that supports Ansible 
+     # Docker image here that supports Ansible 
       # It should have Python for Woking as Control Node. Refer https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements
-      - image: cimg/python:3.10.0
+    docker:
+     - image: cimg/python:3.10.0
     steps:
       # Checkout code from git
       - checkout
+      # attach workspace so that you have access to the previously generated inventory.txt from the deploy-infrastructure job.
+      - attach_workspace:
+          at: ~/
       - restore_cache:
           keys: [backend-build]
       # Add ssh keys with fingerprint  --> https://circleci.com/docs/2.0/add-ssh-key/#adding-ssh-keys-to-a-job
       - add_ssh_keys:
           fingerprints:
             - "13:1d:dd:c2:44:52:ea:22:c2:59:61:79:af:00:27:08"
-      # attach workspace so that you have access to the previously generated inventory.txt from the deploy-infrastructure job.
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install dependencies - AWSCLI
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
@@ -390,6 +385,7 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
+            aws --version
       - run:
           name: Install dependencies - Ansible
           command: |
@@ -401,6 +397,11 @@ jobs:
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
              sudo apt-get install zip gzip tar
+      - run: 
+          name: Installing tar gzip
+          command: |
+             yum install -y tar gzip 
+
       - run:
           name: Install dependencies - Nodejs, NPM
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
