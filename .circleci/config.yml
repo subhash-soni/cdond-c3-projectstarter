@@ -305,6 +305,8 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - restore_cache:
+          keys: [frontend-build]
       - run: 
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
@@ -319,20 +321,19 @@ jobs:
             sudo apt-get update
             sudo apt-get install python    
       - run: python --version
-      - run:
-          name: Install dependencies - NPM
-          # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
-          command: |
-            cd frontend
-            npm install
+      
       - run:
           name: Install dependencies - Nodejs
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
             cd frontend
             sudo apt install nodejs
-          
-
+      - run:
+          name: Install dependencies - NPM
+          # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
+          command: |
+            cd frontend
+            npm install      
       - run:
           name: Get backend url
           # your code here - Copied ec2 describe code from Deploy Infrastructure!
@@ -372,6 +373,8 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       # Add ssh keys with fingerprint  --> https://circleci.com/docs/2.0/add-ssh-key/#adding-ssh-keys-to-a-job
       - add_ssh_keys:
           fingerprints:
@@ -397,12 +400,6 @@ jobs:
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
              sudo apt-get install zip gzip tar
-      # - run:
-      #     name: Install dependencies - NPM
-      #     # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
-      #     command: |
-      #       cd backend
-      #       npm install
       - run:
           name: Install dependencies - Nodejs
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
@@ -410,6 +407,12 @@ jobs:
             cd backend
             sudo apt install nodejs       
           # your code here
+      - run:
+          name: Install dependencies - NPM
+          # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
+          command: |
+            cd backend
+            npm install    
       - run:
           name: Deploy backend
           # your code here
