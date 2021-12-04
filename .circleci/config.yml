@@ -362,10 +362,10 @@ jobs:
             sudo apt install ansible
             sudo ansible --version
       - run: 
-          name: Installing tar gzip
+          name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
-             yum install -y tar gzip
-      
+             sudo apt-get install zip gzip tar
+                   
       - run:
           name: Install dependencies - NPM
           # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
@@ -421,8 +421,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]   
-      - deploy-frontend:
-          requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]    
                     
