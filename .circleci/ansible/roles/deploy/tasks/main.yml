@@ -6,10 +6,11 @@
       update_cache: yes
 
 
-  - name: Extract foo.tgz into /var/lib/foo  
+  - name: Extract artifact.tar.gz file to EC2 Instance 
     unarchive:  
       src: artifact.tar.gz
-      dest: /var/lib/foo  
+      dest: /usr/local/bin/
+ 
 
   - name: "install dependencies nodejs npm"
     become: yes

@@ -225,16 +225,25 @@ jobs:
       # restore the backend cache    
       - restore_cache:
           keys: [backend-build]
+      - run: 
+          name: Install awscli else destroy-environment job keep failing!
+          command: |
+            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+            unzip awscli-bundle.zip
+            sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+
       - run:
           name: Run migrations
           # Your code here
           # Run and save the migration output
           command: |
             cd backend
-            npm install
-            npm audit fix --audit-level=critical --force
-            npm audit fix --force
             npm run migrations > migrations_dump.txt
+           
+          # npm install
+          # npm audit fix --audit-level=critical --force
+          # npm audit fix --force
+            
           # exit 1
       - run:
           name: Send migration results to memstash
