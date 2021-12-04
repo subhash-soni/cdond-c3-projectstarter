@@ -328,8 +328,13 @@ jobs:
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
             cd frontend
-            sudo apt install nodejs
-            sudo apt-get install -y npm   
+            yum -y install nodejs
+            npm --version
+
+
+          # sudo apt install nodejs
+          # sudo apt-get install -y npm 
+          # yum -y install nodejs  
           
       - run:
           name: Get backend url
