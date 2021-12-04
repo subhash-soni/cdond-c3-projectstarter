@@ -1,0 +1,38 @@
+---
+  - name: "update apt packages."
+    become: true
+    become_method: sudo
+    apt:
+      update_cache: yes
+
+
+  - name: Extract foo.tgz into /var/lib/foo  
+    unarchive:  
+      src: artifact.tar.gz
+      dest: /var/lib/foo  
+
+  - name: "install dependencies nodejs npm"
+    become: yes
+    apt:
+      name: ["nodejs", "npm"]
+      state: latest
+      update_cache: yes    
+
+  - name: "install pm2"
+    become: yes
+    npm:
+      name: pm2
+      global: yes
+      production: yes
+      state: present    
+
+  - name: "Stop pm2 that might already be running"
+    become: true
+    command: pm2 stop default
+    ignore_errors: true    
+
+  - name: "Start App"
+    become: true
+    command: pm2 start npm -- start
+    ignore_errors: true    
+    
