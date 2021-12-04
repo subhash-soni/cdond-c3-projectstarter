@@ -305,6 +305,10 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - run: 
+          name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
+          command: |
+            sudo apt-get install zip gzip tar
       - attach_workspace:
           at: ~/
       - run:
@@ -328,10 +332,7 @@ jobs:
             cd frontend
             sudo apt install nodejs
           
-      - run: 
-          name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
-          command: |
-            sudo apt-get install zip gzip tar
+
       - run:
           name: Get backend url
           # your code here - Copied ec2 describe code from Deploy Infrastructure!
@@ -396,12 +397,12 @@ jobs:
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
              sudo apt-get install zip gzip tar
-      - run:
-          name: Install dependencies - NPM
-          # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
-          command: |
-            cd backend
-            npm install
+      # - run:
+      #     name: Install dependencies - NPM
+      #     # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
+      #     command: |
+      #       cd backend
+      #       npm install
       - run:
           name: Install dependencies - Nodejs
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
