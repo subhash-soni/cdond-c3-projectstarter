@@ -22,8 +22,32 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
             exit 1      
-          environment:
-              
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      # Add parameter here 
+      id : 
+        type : string   
+      cond :
+        type : string     
+    steps:
+      - run:
+          name: Revert migrations
+          # Add when this will run
+          # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+          # Add revert code here. You can find this in the Getting Started section.    
+          when: << parameters.cond >> 
+          command: |
+            SUCCESS = $(curl -H "token: f77a911e-0add-4ba5-ae19-b5c5ff2df0a8" --request GET https://api.memstash.io/values/migration_<< parameters.id >>)
+            if(( $SUCCESS == 1 )); 
+            then
+              cd ~/project/backend
+              npm install
+              npm run migrations:revert
+            fi        
+           
+          # exit 1  
+          
 
 jobs:
   build-frontend:
@@ -291,14 +315,6 @@ jobs:
             sudo apt-get update
             sudo apt-get install python    
       - run: python --version
-      # - run:
-      #     name: Install dependencies - AWSCLI
-      #     # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
-      #     command: |
-      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       unzip awscliv2.zip
-      #       sudo ./aws/install
-      
       - run:
           name: Install dependencies - NPM
           # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
@@ -311,6 +327,11 @@ jobs:
           command: |
             cd frontend
             sudo apt install nodejs
+          
+      - run: 
+          name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
+          command: |
+            sudo apt-get install zip gzip tar
       - run:
           name: Get backend url
           # your code here - Copied ec2 describe code from Deploy Infrastructure!
@@ -338,6 +359,9 @@ jobs:
       - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail    
 
   deploy-backend:
     docker:
@@ -372,18 +396,17 @@ jobs:
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
              sudo apt-get install zip gzip tar
-                   
       - run:
           name: Install dependencies - NPM
           # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
           command: |
-            cd frontend
+            cd backend
             npm install
       - run:
           name: Install dependencies - Nodejs
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
-            cd frontend
+            cd backend
             sudo apt install nodejs       
           # your code here
       - run:
@@ -404,6 +427,39 @@ jobs:
       - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+    
+
+
+
+  smoke-test:
+    docker:
+      # Lightweight Docker image 
+    steps:
+      # Checkout code from git
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+      - run:
+          name: Backend smoke test.
+          command: |
+            # your code here
+      - run:
+          name: Frontend smoke test.
+          command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+
 
 
 workflows:
@@ -428,8 +484,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]   
-      - deploy-backend:
-          requires: [run-migrations]
       - deploy-frontend:
+          requires: [run-migrations]    
+      - deploy-backend:
           requires: [run-migrations]    
                     
