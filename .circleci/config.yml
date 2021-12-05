@@ -385,9 +385,10 @@ jobs:
           # sudo ./aws/install
           # aws --version
       - run:
-          name: Install dependencies - Ansible
+          name: Install dependencies - Ansible, NPM
           command: |
             apk add --update ansible
+            apk add --update npm
           # sudo add-apt-repository ppa:ansible/ansible
           # sudo apt-get update
           # sudo apt install ansible
