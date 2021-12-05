@@ -1,9 +1,18 @@
 ---
   - name: Extract artifact.tar.gz file to EC2 Instance 
     unarchive:  
-      src:  /backend/artifact.tar.gz
-      dest: /usr/local/bin/
+      src:  ../../artefacts.tar.gz
+      dest: /home/ubuntu/
+      owner: ubuntu 
       remote_src: no
+
+  - name: "Copy package.json to EC2"
+    become: yes
+    copy:
+      src: ../../frontend/package.json
+      dest: /home/ubuntu/
+      owner: ubuntu
+
  
   - name: "update apt packages."
     become: true
@@ -33,6 +42,19 @@
 
   - name: "Start App"
     become: true
-    command: pm2 start npm -- start
+    command: pm2 start npm -- start -- --port 3030
     ignore_errors: true    
     
+    args:
+      chdir: /home/ubuntu/
+    environment:
+      ENVIRONMENT: production
+      TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
+      TYPEORM_MIGRATIONS_DIR: "./migrations"
+      TYPEORM_MIGRATIONS: "./migrations/*.js"
+      TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+      TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+      TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+      TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+      TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+      TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"

@@ -148,11 +148,9 @@ jobs:
   
   deploy-infrastructure:
     docker:
-      - image: amazon/aws-cli
-      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli   # Docker image here that supports AWS CLI
     steps:
-      - checkout
-      # Checkout code from git
+      - checkout     # Checkout code from git
       - run: 
           name: Installing tar gzip
           command: |
@@ -249,13 +247,6 @@ jobs:
       # restore the backend cache    
       - restore_cache:
           keys: [backend-build]
-      # - run: 
-      #     name: Install python 3 as below AWS CLI version is failing with python 2.7    
-      #     command: |
-      #       sudo apt-get update
-      #       sudo apt-get install python3.8 
-            
-      #       python --version
       - run: 
           name: Install awscli else destroy-environment job keep failing!
             # curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
@@ -273,8 +264,15 @@ jobs:
           # Your code here
           # Run and save the migration output
           command: |
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+           
             cd backend
             npm run migrations > migrations_dump.txt
+            cat  migrations_dump.txt
            
           # npm install
           # npm audit fix --audit-level=critical --force
@@ -291,7 +289,9 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: f77a911e-0add-4ba5-ae19-b5c5ff2df0a8" \
               --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
             fi
-              
+            
+            export MEMSTASH_VALUE=$(curl -H "token: f77a911e-0add-4ba5-ae19-b5c5ff2df0a8" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            echo "${MEMSTASH_VALUE}"    
           # exit 1       
       # Here's where you will add some code to rollback on failure   
       - destroy-environment:
@@ -301,11 +301,10 @@ jobs:
   deploy-frontend:
     # Docker image here that supports AWS CLI
     docker:
-      - image: amazon/aws-cli
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
       - checkout
-      
       - restore_cache:
           keys: [frontend-build]
       - run: 
@@ -324,18 +323,14 @@ jobs:
       # - run: python --version
       
       - run:
-          name: Install dependencies - Nodejs
+          name: Install dependencies - AWSCLi
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
             cd frontend
-            yum -y install nodejs
-            npm --version
-
-
-          # sudo apt install nodejs
-          # sudo apt-get install -y npm 
-          # yum -y install nodejs  
-          
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+         
       - run:
           name: Get backend url
           # your code here - Copied ec2 describe code from Deploy Infrastructure!
@@ -355,17 +350,18 @@ jobs:
           command: |
             cd frontend
             npm install
+            npm update
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       
-      # # Here's where you will add some code to rollback on failure 
-      # - destroy-environment:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail
-      # - revert-migrations:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail    
+      # Here's where you will add some code to rollback on failure 
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail    
 
   deploy-backend:
      # Docker image here that supports Ansible 
@@ -404,12 +400,12 @@ jobs:
           command: |
              sudo apt-get install zip gzip tar
       - run:
-          name: Install dependencies - Nodejs, NPM
+          name: Install dependencies - Nodejs
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
             cd backend
-            sudo apt install nodejs 
-            sudo apt-get install -y npm       
+            apk add--update nodejs 
+            apk add --update npm       
           # your code here
       # - run:
       #     name: Install dependencies - NPM
@@ -431,13 +427,13 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
 
-      # # Here's where you will add some code to rollback on failure  
-      # - destroy-environment:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail
-      # - revert-migrations:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
  
 
 
