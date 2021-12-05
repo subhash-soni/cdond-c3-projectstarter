@@ -15,13 +15,13 @@ commands:
           when: << parameters.cond >>
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
-            exit 1
+          # exit 1
       - run:
           name: Destroy environments - Frontend 
           when: << parameters.cond >>
           command: |
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
-            exit 1      
+          # exit 1      
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -310,18 +310,9 @@ jobs:
       - run: 
           name: Installing tar gzip
           command: |
-             yum install -y tar gzip    
+             sudo apt-get install zip gzip tar    
       - attach_workspace:
           at: ~/         
-      # - run:
-      #     name: Install dependencies - Python
-      #     # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
-      #     command: |
-      #       cd frontend
-      #       sudo apt-get update
-      #       sudo apt-get install python    
-      # - run: python --version
-      
       - run:
           name: Install dependencies - AWSCLi
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
@@ -356,10 +347,10 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       
       # Here's where you will add some code to rollback on failure 
-      - destroy-environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          cond: on_fail
       - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail    
+      - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail    
 
@@ -399,20 +390,14 @@ jobs:
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
              sudo apt-get install zip gzip tar
-      - run:
-          name: Install dependencies - Nodejs
-          # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
-          command: |
-            cd backend
-            apk add--update nodejs 
-            apk add --update npm       
-          # your code here
       # - run:
-      #     name: Install dependencies - NPM
-      #     # your code here  -> https://docs.npmjs.com/cli/v6/commands/npm-install
+      #     name: Install dependencies - Nodejs
+      #     # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
       #     command: |
       #       cd backend
-      #       sudo apt-get install -y npm    
+      #       apk add--update nodejs 
+      #       apk add --update npm       
+      #     # your code here
       - run:
           name: Deploy backend
           # your code here
@@ -428,12 +413,12 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
 
       # Here's where you will add some code to rollback on failure  
-      - destroy-environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          cond: on_fail
       - revert-migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail    
  
 
 
