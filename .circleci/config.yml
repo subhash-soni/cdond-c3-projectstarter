@@ -380,33 +380,18 @@ jobs:
             apk add --update curl  
             pip install awscli
 
-          # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          # unzip awscliv2.zip
-          # sudo ./aws/install
-          # aws --version
       - run:
           name: Install dependencies - Ansible, NPM
           command: |
             apk add --update ansible
             apk add --update npm
-          # sudo add-apt-repository ppa:ansible/ansible
-          # sudo apt-get update
-          # sudo apt install ansible
-          # sudo ansible --version
+      
       - run: 
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
             apk add --update tar                        
             apk add --update gzip
-          # sudo apt-get install zip gzip tar
-      # - run:
-      #     name: Install dependencies - Nodejs
-      #     # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
-      #     command: |
-      #       cd backend
-      #       apk add--update nodejs 
-      #       apk add --update npm       
-      #     # your code here
+      
       - run:
           name: Deploy backend
           # your code here
@@ -429,6 +414,122 @@ jobs:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail    
  
+  smoke-test:
+    docker:
+     - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      - checkout
+      # attach workspace so that you have access to the previously generated inventory.txt from the deploy-infrastructure job.
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies - Curl,awscli,ansible,npm,tar,gzib - Same as Deploy Backend
+          command: |
+            apk add --update curl  
+            pip install awscli
+            apk add --update ansible
+            apk add --update npm
+            apk add --update tar                        
+            apk add --update gzip
+      - run:
+          name: Get backend url (Same as Backend Deploy)
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
+
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            
+      - run:
+          name: Backend smoke test.
+          command: |
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+             return 0
+            else
+             return 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/index.html"
+            if curl -s ${URL} | grep "Welcome"  
+            then
+              return 1
+            else
+              return 1
+            fi
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail 
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+    
+
+  cloudfront-update:
+    docker: 
+      - image:  amazon/aws-cli 
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --stack-name InitialStack \
+            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --tags project=udapeople
+
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail 
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+
+cleanup:
+    docker:
+      # Docker image here
+      - image: amazon/aws-cli 
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Get old stack workflow id
+          command: |
+            export OldWorkflowID=$(aws cloudformation \
+              list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+              --no-paginate --output text)
+            
+            export OldWorkflowID="${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+            --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+            
+            echo Stack names: "${STACKS[@]}"
+
+      - run:
+          name: Remove old stacks and files
+          command: |
+            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+            then
+              aws cloudformation delete-stack --stack-name udapeople-backend-${OldWorkflowID}
+              aws cloudformation delete-stack --stack-name udapeople-frontend-${OldWorkflowID}
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+            fi
+             
 
 
 workflows:
@@ -456,5 +557,12 @@ workflows:
       - deploy-backend:
           requires: [run-migrations]    
       - deploy-frontend:
-          requires: [run-migrations]        
+          requires: [run-migrations]  
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
+                   
                     
