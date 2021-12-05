@@ -182,8 +182,8 @@ jobs:
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text >> inventory.txt
-            cat inventory.txt
+              --output text >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
           # exit 1
       - persist_to_workspace:
           root: ~/
@@ -292,6 +292,8 @@ jobs:
             
             export MEMSTASH_VALUE=$(curl -H "token: f77a911e-0add-4ba5-ae19-b5c5ff2df0a8" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
             echo "${MEMSTASH_VALUE}"    
+            echo "workflow id is: " ${CIRCLE_WORKFLOW_ID:0:7}
+
           # exit 1       
       # Here's where you will add some code to rollback on failure   
       - destroy-environment:
@@ -358,7 +360,7 @@ jobs:
      # Docker image here that supports Ansible 
       # It should have Python for Woking as Control Node. Refer https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements
     docker:
-     - image: cimg/python:3.10.0
+     - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
       - checkout
@@ -444,8 +446,8 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]   
-      - deploy-frontend:
-          requires: [run-migrations]    
       - deploy-backend:
           requires: [run-migrations]    
+      - deploy-frontend:
+          requires: [run-migrations, deploy-backend]        
                     
