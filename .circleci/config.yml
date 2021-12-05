@@ -377,22 +377,27 @@ jobs:
           name: Install dependencies - AWSCLI
           # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
           command: |
-            apk add --update curl          
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-            aws --version
+            apk add --update curl  
+            pip install awscli
+
+          # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          # unzip awscliv2.zip
+          # sudo ./aws/install
+          # aws --version
       - run:
           name: Install dependencies - Ansible
           command: |
-            sudo add-apt-repository ppa:ansible/ansible
-            sudo apt-get update
-            sudo apt install ansible
-            sudo ansible --version
+            apk add --update ansible
+          # sudo add-apt-repository ppa:ansible/ansible
+          # sudo apt-get update
+          # sudo apt install ansible
+          # sudo ansible --version
       - run: 
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
           command: |
-             sudo apt-get install zip gzip tar
+            apk add --update tar                        
+            apk add --update gzip
+          # sudo apt-get install zip gzip tar
       # - run:
       #     name: Install dependencies - Nodejs
       #     # your code here  -> Refer to https://docs.aws.amazon.com/cli/v1/userguide/install-linux.html
