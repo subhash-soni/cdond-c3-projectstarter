@@ -384,7 +384,9 @@ jobs:
           name: Install dependencies - Ansible, NPM
           command: |
             apk add --update ansible
+            apk add --update nodejs
             apk add --update npm
+
       
       - run: 
           name: Installing tar gzip   # refer https://stackoverflow.com/questions/33423915/how-to-zip-a-file-in-ubuntu
