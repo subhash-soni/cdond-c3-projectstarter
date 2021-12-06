@@ -264,11 +264,11 @@ jobs:
           # Your code here
           # Run and save the migration output
           command: |
-            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/development.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/development.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/development.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/development.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/development.env"
            
             cd backend
             npm run migrations > migrations_dump.txt
