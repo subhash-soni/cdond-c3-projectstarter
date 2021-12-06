@@ -264,7 +264,8 @@ jobs:
           # Your code here
           # Run and save the migration output
           command: |
-            echo ENVIROMENT=production > "backend/.env"
+            echo NODE_ENV=production > "backend/.env"
+            echo VERSION=1 > "backend/.env"
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
@@ -273,7 +274,7 @@ jobs:
             echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env" 
             cd backend
             npm run migrations > migrations_dump.txt
             cat  migrations_dump.txt
@@ -402,7 +403,8 @@ jobs:
           name: Deploy backend
           # your code here
           command: |
-            echo ENVIROMENT=production > "backend/.env"
+            echo NODE_ENV=production > "backend/.env"
+            echo VERSION=1 > "backend/.env"
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
@@ -477,12 +479,12 @@ jobs:
               return 1
             fi
       # Here's where you will add some code to rollback on failure  
-      # - destroy-environment:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail 
-      # - revert-migrations:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail 
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
     
 
   # cloudfront-update:
