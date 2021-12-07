@@ -8,8 +8,8 @@
     - ansible_python_interpreter: /usr/bin/python3
     - ansible_host_key_checking: false
     - ansible_stdout_callback: yaml
-    - ansible_ssh_user: ubuntu
-    - ansible_user: ubuntu
+    # - ansible_ssh_user: ubuntu
+    # - ansible_user: ubuntu
   roles:
     - deploy
   # Get the environment variables from CircleCI and add to the EC2 instance
