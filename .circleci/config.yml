@@ -17,10 +17,13 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
           # exit 1
       - run:
+          # first empty the bucket then delete the frontend stack else it will fail
           name: Destroy environments - Frontend 
           when: << parameters.cond >>
           command: |
+            aws s3 rm s3://udapeople-<< parameters.id >> --recursive    
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
+          
           # exit 1      
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -340,7 +343,7 @@ jobs:
   
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
             cat frontend/.env
       - run:
           name: Deploy frontend objects
@@ -349,6 +352,8 @@ jobs:
             cd frontend
             npm install
             npm update
+            npx browserslist@latest --update-db
+            npm install --save-dev webpack webpack-dev-server
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
@@ -403,8 +408,12 @@ jobs:
           name: Deploy backend
           # your code here
           command: |
-            echo NODE_ENV=production > "backend/.env"
-            echo VERSION=1 > "backend/.env"
+            cd backend
+            apk add --update nodejs
+            apk add --update npm
+            npm i
+            echo NODE_ENV=production >> "backend/.env"
+            echo VERSION=1 >> "backend/.env"
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
@@ -414,16 +423,16 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"  
-            cd backend
-            npm i
+            
             npm run build
             cd ..
-            tar -czvf artefacts.tar.gz ./backend 
-            cd .circleci/ansible
+            tar -czvf artefacts.tar.gz dist/
+            mv artefacts.tar.gz ../.circleci/ansible/
+            cd ../.circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-
+      # tar -czvf artefacts.tar.gz ./backend 
       # Here's where you will add some code to rollback on failure  
       - revert-migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
@@ -454,6 +463,7 @@ jobs:
           name: Backend smoke test. 
           #Get backend url (Same as Backend Deploy) and test it for ok status
           command: |
+            cd backend
             export BACKEND_IP=$(aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
