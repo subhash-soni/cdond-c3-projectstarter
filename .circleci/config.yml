@@ -408,10 +408,6 @@ jobs:
           name: Deploy backend
           # your code here
           command: |
-            cd backend
-            apk add --update nodejs
-            apk add --update npm
-            npm i
             echo NODE_ENV=production >> "backend/.env"
             echo VERSION=1 >> "backend/.env"
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
@@ -423,16 +419,16 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"  
-            
+            cd backend
+            npm i
             npm run build
             cd ..
-            tar -czvf artefacts.tar.gz dist/
-            mv artefacts.tar.gz ../.circleci/ansible/
-            cd ../.circleci/ansible
+            tar -czvf artefacts.tar.gz ./backend 
+            cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      # tar -czvf artefacts.tar.gz ./backend 
+      
       # Here's where you will add some code to rollback on failure  
       - revert-migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
