@@ -43,10 +43,10 @@
   - name: "Start App"
     become: true
     # command: pm2 start npm -- start --name "udapeople-app"
-    command: pm2 start npm -- start -- --port 3030
+    command: pm2 start npm -- start --port 3030
     ignore_errors: true    
     args:
-      chdir: /home/ubuntu/
+      chdir: /home/ubuntu/backend/
     environment:
       ENVIRONMENT: production
       TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
