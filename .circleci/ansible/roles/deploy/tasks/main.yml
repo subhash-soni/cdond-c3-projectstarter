@@ -35,15 +35,15 @@
       production: yes
       state: present    
 
-  - name: "Stop pm2 that might already be running"
-    become: true
-    command: pm2 stop default
-    ignore_errors: true    
+  # - name: "Stop pm2 that might already be running"
+  #   become: true
+  #   command: pm2 stop default
+  #   ignore_errors: true    
 
   - name: "Start App"
     become: true
-    command: pm2 start npm -- start --name "udapeople-app"
-    # command: pm2 start npm -- start -- --port 3030
+    # command: pm2 start npm -- start --name "udapeople-app"
+    command: pm2 start npm -- start -- --port 3030
     ignore_errors: true    
     args:
       chdir: /home/ubuntu/
