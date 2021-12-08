@@ -50,14 +50,15 @@
 
   - name: "Start App"
     become: true
-    command: . .env ; npm start 
+    # command: 
+    shell: | 
+            cd backend
+            npm start 
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
-    # file:
-    #   path: /home/ubuntu/backend/
-    #   state: directory
-    args:
-      chdir: /home/ubuntu/backend/
+    # args:
+    #   chdir: /home/ubuntu/backend/
+      # chdir: /home/ubuntu/backend/
     environment:
       # ENVIRONMENT: production
       NOD_ENV: production
