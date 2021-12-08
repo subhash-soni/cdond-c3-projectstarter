@@ -52,11 +52,11 @@
     become: true
     command: pm2 start npm -- start --port 3030
     ignore_errors: true    
-    file:
-      path: /home/ubuntu/backend/
-      state: directory
-    # args:
-    #   chdir: /home/ubuntu/backend/
+    # file:
+    #   path: /home/ubuntu/backend/
+    #   state: directory
+    args:
+      chdir: /home/ubuntu/backend/
     environment:
       # ENVIRONMENT: production
       NOD_ENV: production
