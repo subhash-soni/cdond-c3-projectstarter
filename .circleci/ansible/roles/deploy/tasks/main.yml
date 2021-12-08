@@ -55,8 +55,8 @@
     # file:
     #   path: /home/ubuntu/backend/
     #   state: directory
-    args:
-      chdir: /home/ubuntu/backend/
+    # args:
+    #   chdir: /home/ubuntu/backend/
     environment:
       # ENVIRONMENT: production
       NOD_ENV: production
