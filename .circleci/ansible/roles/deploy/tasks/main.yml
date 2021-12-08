@@ -7,12 +7,12 @@
       owner: ubuntu 
       remote_src: no
 
-  - name: "Copy package.json to EC2"
-    become: yes
-    copy:
-      src: ../../frontend/package.json
-      dest: /home/ubuntu/
-      owner: ubuntu
+  # - name: "Copy package.json to EC2"
+  #   become: yes
+  #   copy:
+  #     src: ../../frontend/package.json
+  #     dest: /home/ubuntu/
+  #     owner: ubuntu
 
  
   - name: "update apt packages."
@@ -50,13 +50,14 @@
 
   - name: "Start App"
     become: true
-    command: pm2 start npm -- start --port 3030
+    command: cd backend && npm start 
+    # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
     # file:
     #   path: /home/ubuntu/backend/
     #   state: directory
-    # args:
-    #   chdir: /home/ubuntu/backend/
+    args:
+      chdir: /home/ubuntu/backend/
     environment:
       # ENVIRONMENT: production
       NOD_ENV: production
