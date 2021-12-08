@@ -404,16 +404,6 @@ jobs:
             apk add --update tar                        
             apk add --update gzip
       - run:
-          name: Add Inventory file
-          command: |
-            cd .circleci/ansible
-            aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text >> inventory.txt
-            cat inventory.txt 
-
-      - run:
           name: Deploy backend
           # your code here
           command: |
