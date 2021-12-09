@@ -37,7 +37,19 @@
       production: yes
       state: present   
   
-  
+  - name: "pm2 version inquiry"
+    become: true
+    command: pm2 -v
+
+  - name: "Stop pm2"
+    become: true
+    command: pm2 stop default
+   
+  - name: "Install netstat tool"
+    become: true
+    # command: 
+    command: sudo apt install net-tools
+            
 
   # - name: "Stop pm2 that might already be running"
   #   become: true
@@ -53,10 +65,13 @@
     become: true
     # command: 
     shell: | 
-            sudo apt install net-tools
             cd backend
+            echo 'inside backend folder'
             export NODE_PATH=/home/ubuntu/backend/node_modules
             echo $NODE_PATH
+            pm2 -v
+            pm2 stop default
+            pm2 start npm -- start 
             pm2 stop default
             pm2 start npm -- start 
             netstat -tulpn
