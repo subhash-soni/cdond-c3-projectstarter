@@ -41,9 +41,9 @@
     become: true
     command: pm2 -v
 
-  - name: "Stop pm2"
-    become: true
-    command: pm2 stop default
+  # - name: "Stop pm2"
+  #   become: true
+  #   command: pm2 stop default
    
   - name: "Install netstat tool"
     become: true
@@ -70,7 +70,6 @@
             export NODE_PATH=/home/ubuntu/backend/node_modules
             echo $NODE_PATH
             pm2 -v
-            pm2 stop default
             pm2 start npm -- start 
             pm2 stop default
             pm2 start npm -- start 
