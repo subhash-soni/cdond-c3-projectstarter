@@ -57,7 +57,7 @@
             export NODE_PATH=/home/ubuntu/backend/node_modules
             echo $NODE_PATH
             cd dist
-            pm2 start npm 
+            pm2 start npm -- start
             netstat -tulpn
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
