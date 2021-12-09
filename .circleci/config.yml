@@ -278,6 +278,7 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"   
+            echo NODE_PATH=/home/ubuntu/backend/node_modules >> "backend/.env"
             cd backend
             npm run migrations > migrations_dump.txt
             cat  migrations_dump.txt
@@ -408,7 +409,6 @@ jobs:
           # your code here
           command: |
             echo NODE_ENV=production >> "backend/.env"
-            export NODE_PATH=/home/ubuntu/backend/node_modules >> "backend/.env"
             echo VERSION=1 >> "backend/.env"
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
@@ -419,7 +419,7 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"  
-             
+            echo NODE_PATH=/home/ubuntu/backend/node_modules >> "backend/.env" 
             cd backend
             npm i
             npm run build
