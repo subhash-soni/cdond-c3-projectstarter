@@ -31,7 +31,7 @@
 
   - name: "install pm2"
     become: yes
-    npm:
+    apt:
       name: pm2
       global: yes
       production: yes
@@ -39,7 +39,7 @@
   
   - name: "pm2 version inquiry"
     become: true
-    command: pm2 -v
+    command: pm2 startup
 
   # - name: "Stop pm2"
   #   become: true
@@ -69,10 +69,8 @@
             echo 'inside backend folder'
             export NODE_PATH=/home/ubuntu/backend/node_modules
             echo $NODE_PATH
-            pm2 -v
             pm2 start npm -- start 
             pm2 stop default
-            pm2 start npm -- start 
             netstat -tulpn
             curl localhost:3030/api/status
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
