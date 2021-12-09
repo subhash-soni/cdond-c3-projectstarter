@@ -7,12 +7,12 @@
       owner: ubuntu 
       remote_src: no
 
-  # - name: "Copy package.json to EC2"
-  #   become: yes
-  #   copy:
-  #     src: ../../frontend/package.json
-  #     dest: /home/ubuntu/
-  #     owner: ubuntu
+  - name: "Copy package.json to EC2"
+    become: yes
+    copy:
+      src: ../../backend/package.json
+      dest: /home/ubuntu/
+      owner: ubuntu
 
  
   - name: "update apt packages."
@@ -52,8 +52,12 @@
     become: true
     # command: 
     shell: | 
+            export NODE_PATH=/home/ubuntu/backend/node_modules
+            echo $NODE_PATH
+            sudo apt install net-tools
             cd backend
-            npm start 
+            pm2 npm start 
+            netstat -tulpn
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
     # args:
