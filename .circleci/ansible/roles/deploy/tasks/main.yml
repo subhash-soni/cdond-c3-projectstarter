@@ -55,17 +55,18 @@
     become: true
     # command: 
     shell: | 
-        npm install pm2 -g 
-        pm2 update
-        cd /home/ubuntu
-        cd backend
-        pm2 list all
-        pm2 stop default
         pm2 start npm -- start -- port 3030
-        pm2 stop default
-        pm2 start npm -- start -- port 3030
-        netstat -tulpn
         curl localhost:3030/api/status
+    # pm2 stop default
+    # pm2 start npm -- start -- port 3030
+    # netstat -tulpn
+    # curl localhost:3030/api/status
+    # npm install pm2 -g 
+    # pm2 update
+    # cd /home/ubuntu
+    # cd backend
+    # pm2 list all
+    # pm2 stop default 
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
     environment:
