@@ -43,23 +43,26 @@
   #   command: npm install pm2 -g
 
   
-  - name: "pm2 startup "
-    become: true
-    shell: |
-        cd backend
-        echo 'inside backend folder-1...'
-        export NODE_PATH=/home/ubuntu/backend/node_modules
-        echo $NODE_PATH
-        pm2 startup
+  # - name: "pm2 startup "
+  #   become: true
+  #   shell: |
+  #       cd backend
+  #       echo 'inside backend folder-1...'
+  #       export NODE_PATH=/home/ubuntu/backend/node_modules
+  #       echo $NODE_PATH
+  #       pm2 startup
 
   - name: "Start App"
     become: true
     # command: 
     shell: | 
-          pm2 stop default
-          pm2 start npm -- start 
-          netstat -tulpn
-          curl localhost:3030/api/status
+        pm2 stop default
+        cd backend
+        pm2 start npm -- start 
+        pm2 stop default
+        pm2 start npm -- start 
+        netstat -tulpn
+        curl localhost:3030/api/status
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
     environment:
