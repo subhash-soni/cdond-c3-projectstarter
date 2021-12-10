@@ -37,8 +37,8 @@
   #   command: pm2 stop default
    
   - name: "Install netstat tool"
-    become: true
-    become_method: sudo
+    become: yes
+    # become_method: sudo
     apt:
       name:  ["net-tools"]
     state: latest
