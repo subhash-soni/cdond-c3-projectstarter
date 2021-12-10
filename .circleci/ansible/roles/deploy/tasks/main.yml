@@ -56,10 +56,9 @@
     become: true
     # command: 
     shell: | 
-        pm2 stop default
         cd backend
-        pm2 start npm -- start 
-        pm2 stop default
+        ls -la 
+        pm2 list all
         pm2 start npm -- start 
         netstat -tulpn
         curl localhost:3030/api/status
