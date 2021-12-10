@@ -29,17 +29,8 @@
       state: latest
       update_cache: yes        
 
-  - name: "install pm2"
-    become: yes
-    apt:
-      name: pm2
-      global: yes
-      production: yes
-      state: present   
   
-  - name: "pm2 version inquiry"
-    become: true
-    command: pm2 startup
+
 
   # - name: "Stop pm2"
   #   become: true
@@ -47,8 +38,13 @@
    
   - name: "Install netstat tool"
     become: true
+    become_method: sudo
+    apt:
+      name:  ["net-tools"]
+    state: latest
+    update_cache: yes  
     # command: 
-    command: sudo apt install net-tools
+    # command: sudo apt install net-tools
             
 
   # - name: "Stop pm2 that might already be running"
@@ -61,18 +57,30 @@
   #   # args:
   #   #   chdir: /home/ubuntu/backend/
 
+  - name: "pm2 install global "
+    become: true
+    command: npm install pm2 -g
+
+  
+  - name: "pm2 startup "
+    become: true
+    shell: |
+        cd backend
+        echo 'inside backend folder-1...'
+        export NODE_PATH=/home/ubuntu/backend/node_modules
+        echo $NODE_PATH
+        pm2 startup
+
   - name: "Start App"
     become: true
     # command: 
     shell: | 
-            cd backend
-            echo 'inside backend folder'
-            export NODE_PATH=/home/ubuntu/backend/node_modules
-            echo $NODE_PATH
-            pm2 start npm -- start 
-            pm2 stop default
-            netstat -tulpn
-            curl localhost:3030/api/status
+          echo 'inside backend folder-2...'
+          export NODE_PATH=/home/ubuntu/backend/node_modules
+          echo $NODE_PATH
+          pm2 start npm -- start 
+          netstat -tulpn
+          curl localhost:3030/api/status
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
     # args:
