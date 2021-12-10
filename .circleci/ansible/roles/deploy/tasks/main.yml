@@ -56,8 +56,8 @@
     become: true
     # command: 
     shell: | 
-        su - ubuntu
-        cd backend
+        
+        cd /home/ubuntu/backend
         ls -la 
         pm2 list all
         pm2 start npm -- start 
