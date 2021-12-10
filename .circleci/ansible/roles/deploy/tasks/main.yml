@@ -22,12 +22,12 @@
   #     update_cache: yes
       
   
-  # - name: "install dependencies nodejs npm"
-  #   become: yes
-  #   apt:
-  #     name: ["nodejs", "npm"]
-  #     state: latest
-  #     update_cache: yes        
+  - name: "install dependencies nodejs npm"
+    become: yes
+    apt:
+      name: ["nodejs", "npm", "pm2"]
+      state: latest
+      update_cache: yes        
 
   
   # - name: "Install netstat tool"
