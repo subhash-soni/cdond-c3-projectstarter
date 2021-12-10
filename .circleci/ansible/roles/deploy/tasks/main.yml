@@ -56,6 +56,7 @@
     become: true
     # command: 
     shell: | 
+        su - ubuntu
         cd backend
         ls -la 
         pm2 list all
