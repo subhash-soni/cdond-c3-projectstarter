@@ -51,16 +51,15 @@
   #       export NODE_PATH=/home/ubuntu/backend/node_modules
   #       echo $NODE_PATH
   #       pm2 startup
-
   - name: "Start App"
     become: true
     # command: 
     shell: | 
-        
-        cd /home/ubuntu/backend
-        ls -la 
+        cd backend
+        whoami
         pm2 list all
-        pm2 start npm -- start 
+        pm2 stop default
+        pm2 start npm -- start -- port 3030
         netstat -tulpn
         curl localhost:3030/api/status
     # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
