@@ -55,8 +55,8 @@
     become: true
     # command: 
     shell: | 
+        cd /home/ubuntu
         cd backend
-        whoami
         pm2 list all
         pm2 stop default
         pm2 start npm -- start -- port 3030
