@@ -1,18 +1,18 @@
 ---
 
-  - name: Extract artifact.tar.gz file to EC2 Instance 
-    unarchive:  
-      src:  ../../artefacts.tar.gz
-      dest: /home/ubuntu/
-      owner: ubuntu 
-      remote_src: no
+  # - name: Extract artifact.tar.gz file to EC2 Instance 
+  #   unarchive:  
+  #     src:  ../../artefacts.tar.gz
+  #     dest: /home/ubuntu/
+  #     owner: ubuntu 
+  #     remote_src: no
 
-  - name: "Copy package.json to EC2"
-    become: yes
-    copy:
-      src: ../../backend/package.json
-      dest: /home/ubuntu/
-      owner: ubuntu
+  # - name: "Copy package.json to EC2"
+  #   become: yes
+  #   copy:
+  #     src: ../../backend/package.json
+  #     dest: /home/ubuntu/
+  #     owner: ubuntu
   
   - name: "install dependencies nodejs npm"
     become: yes
