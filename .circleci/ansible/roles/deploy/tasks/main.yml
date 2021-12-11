@@ -64,6 +64,7 @@
         systemctl reload-or-restart pm2-ubuntu
         pm2 start npm -- start -- port 3030
         curl localhost:3030/api/status
+        netstat -tulpn
     # pm2 stop default
     # pm2 start npm -- start -- port 3030
     # netstat -tulpn
