@@ -61,6 +61,7 @@
         cd /home/ubuntu/backend
         pm2 startup systemd
         export PM2_HOME='/home/ubuntu/.pm2' 
+        systemctl reload-or-restart pm2-ubuntu
         pm2 start npm -- start -- port 3030
         curl localhost:3030/api/status
     # pm2 stop default
