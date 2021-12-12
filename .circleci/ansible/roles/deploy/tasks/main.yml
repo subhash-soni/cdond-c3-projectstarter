@@ -1,11 +1,11 @@
 ---
 
-  # - name: Extract artifact.tar.gz file to EC2 Instance 
-  #   unarchive:  
-  #     src:  ../../artefacts.tar.gz
-  #     dest: /home/ubuntu/
-  #     owner: ubuntu 
-  #     remote_src: no
+  - name: Extract artifact.tar.gz file to EC2 Instance 
+    unarchive:  
+      src:  ../../artefacts.tar.gz
+      dest: /home/ubuntu/
+      owner: ubuntu 
+      remote_src: no
 
   - name: "Copy package.json to EC2"
     become: yes
@@ -14,35 +14,35 @@
       dest: /home/ubuntu/
       owner: ubuntu
   
-  # - name: "install dependencies nodejs npm"
-  #   become: yes
-  #   apt:
-  #     name: ["nodejs", "npm"]
-  #     state: present
-  #     update_cache: yes    
+  - name: "install dependencies nodejs npm"
+    become: yes
+    apt:
+      name: ["nodejs", "npm"]
+      state: present
+      update_cache: yes    
           
   
-  # - name: "Install netstat tool"
-  #   become: yes
-  #   apt:
-  #     name:  ["net-tools"]
-  #     state: latest
-  #     update_cache: yes  
+  - name: "Install netstat tool"
+    become: yes
+    apt:
+      name:  ["net-tools"]
+      state: latest
+      update_cache: yes  
 
-  # - name: "update apt packages."
-  #   become: true
-  #   become_method: sudo
-  #   apt:
-  #     update_cache: yes
+  - name: "update apt packages."
+    become: true
+    become_method: sudo
+    apt:
+      update_cache: yes
 
  
-  # - name: "pm2 install global "
-  #   become: true
-  #   remote_user: ubuntu  
-  #   # command: npm install pm2 -g
-  #   shell: |
-  #         cd /home/ubuntu/
-  #         npm install pm2 -g
+  - name: "pm2 install global "
+    become: true
+    remote_user: ubuntu  
+    # command: npm install pm2 -g
+    shell: |
+          cd /home/ubuntu/
+          npm install pm2 -g
 
   
   # - name: "pm2 startup "
@@ -58,12 +58,13 @@
     remote_user: ubuntu 
     # command: 
     shell: | 
-        cd /home/ubuntu/backend
+        cd backend
         export NODE_PATH=/home/ubuntu/backend/node_modules
         pm2 list 
-        cd ..
         pm2 stop all 
-        pm2 start npm -- start --name backend
+        pm2 start npm -- start 
+        pm2 status all
+        netstat -tulpn
         curl localhost:3030/api/status
         netstat -tulpn
       # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
