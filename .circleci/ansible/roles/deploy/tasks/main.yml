@@ -60,7 +60,10 @@
     shell: | 
         cd /home/ubuntu/backend
         export NODE_PATH=/home/ubuntu/backend/node_modules
-        pm2 start npm -- start -- port 3030
+        pm2 list 
+        cd ..
+        pm2 stop all 
+        pm2 start npm -- start --name backend
         curl localhost:3030/api/status
         netstat -tulpn
       # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
