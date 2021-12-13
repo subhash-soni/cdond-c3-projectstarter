@@ -1,5 +1,4 @@
 ---
-
   - name: Extract artifact.tar.gz file to EC2 Instance 
     unarchive:  
       src:  ../../artefacts.tar.gz
@@ -44,12 +43,12 @@
           npm install -g typescript
 
   - name: "Start App"
-    become: true
+    become: yes
     # remote_user: ubuntu 
     become_user: ubuntu  
     # command: 
     shell: | 
-        cd backend
+        cd /home/ubuntu/backend
         export NODE_PATH=/home/ubuntu/backend/node_modules
         pm2 list 
         pm2 stop all 
@@ -66,8 +65,8 @@
       NODE_PATH: /home/ubuntu/backend/node_modules
       TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
       TYPEORM_MIGRATIONS_DIR: "./migrations"
-      TYPEORM_MIGRATIONS: "./migrations/*.ts"
-      TYPEORM_ENTITIES: "./modules/domain/**/*.entity.ts"
+      TYPEORM_MIGRATIONS: "./migrations/*.js"
+      TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
       TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
       TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
       TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
