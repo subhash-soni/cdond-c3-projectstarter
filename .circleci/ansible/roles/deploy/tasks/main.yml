@@ -30,32 +30,23 @@
       update_cache: yes  
 
   - name: "update apt packages."
-    become: true
+    become: yes
     become_method: sudo
     apt:
       update_cache: yes
 
  
   - name: "pm2 install global "
-    become: true
-    remote_user: ubuntu  
-    # command: npm install pm2 -g
+    become: yes
     shell: |
           cd /home/ubuntu/
           npm install pm2 -g
+          npm install -g typescript
 
-  
-  # - name: "pm2 startup "
-  #   become: true
-  #   shell: |
-  #       cd backend
-  #       echo 'inside backend folder-1...'
-  #       export NODE_PATH=/home/ubuntu/backend/node_modules
-  #       echo $NODE_PATH
-  #       pm2 startup
   - name: "Start App"
     become: true
-    remote_user: ubuntu 
+    # remote_user: ubuntu 
+    become_user: ubuntu  
     # command: 
     shell: | 
         cd backend
