@@ -409,25 +409,26 @@ jobs:
           name: Deploy backend
           # your code here
           command: |
-            echo NODE_ENV=production >> "backend/.env"
-            echo ENVIRONMENT=production >> "backend/.env"
-            echo VERSION=1 >> "backend/.env"
-            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.js >> "backend/.env"
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.js >> "backend/.env"
-            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"  
-            echo NODE_PATH=/home/ubuntu/backend/node_modules >> "backend/.env" 
             cd backend
             npm i
             npm install typescript --save-dev
             npm run build
-            cd ..
-            tar -czvf artefacts.tar.gz ./backend 
+            mv node_modules dist
+            echo NODE_ENV=production >> "dist/.env"
+            echo ENVIRONMENT=production >> "dist/.env"
+            echo VERSION=1 >> "dist/.env"
+            echo TYPEORM_CONNECTION=postgres >> "dist/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "dist/.env"
+            echo TYPEORM_ENTITIES=./modules/domain/**/*.entity.js >> "dist/.env"
+            echo TYPEORM_MIGRATIONS=./migrations/*.js >> "dist/.env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "dist/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "dist/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "dist/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "dist/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "dist/.env"  
+            echo NODE_PATH=/home/ubuntu/dist/node_modules >> "dist/.env" 
+            
+            tar -czvf artefacts.tar.gz ./dist 
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
