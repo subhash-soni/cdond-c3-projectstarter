@@ -428,7 +428,7 @@ jobs:
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "dist/.env"  
             echo NODE_PATH=/home/ubuntu/dist/node_modules >> "dist/.env" 
             tar -czvf artefacts.tar.gz ./dist 
-            cd ../..  
+            cd ..
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
