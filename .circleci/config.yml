@@ -25,7 +25,7 @@ commands:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
       # Add parameter here 
-      workflow_token_id: 
+      tokenid: 
         type : string   
       id : 
         type : string   
@@ -39,7 +39,7 @@ commands:
           # Add revert code here. You can find this in the Getting Started section.    
           when: << parameters.cond >> 
           command: |
-            export SUCCESS=$(curl -H "token: << parameters.workflow_token_id >>" --request GET https://api.memstash.io/values/migration_<< parameters.id >>)
+            export SUCCESS=$(curl -H "token: << parameters.tokenid >>" --request GET https://api.memstash.io/values/migration_<< parameters.id >>)
             
             
             if(( $SUCCESS == 1 )); 
@@ -357,13 +357,13 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       
       # Here's where you will add some code to rollback on failure 
-      - revert-migrations:
-          workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          cond: on_fail
       - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
-          cond: on_fail    
+          cond: on_fail     
+      - revert-migrations:
+          tokenid: ${CIRCLE_WORKFLOW_ID}  # to be used as token
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
 
   deploy-backend:
      # Docker image here that supports Ansible 
@@ -432,11 +432,11 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml            
       
       #Here's where you will add some code to rollback on failure  
-      - revert-migrations:
-          workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          cond: on_fail
       - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail    
+      - revert-migrations:
+          tokenid: ${CIRCLE_WORKFLOW_ID}  # to be used as token
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail    
  
@@ -486,14 +486,13 @@ jobs:
               return 1
             fi
       #Here's where you will add some code to rollback on failure  
-      - revert-migrations:
-          workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          cond: on_fail
       - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail     
-    
+      - revert-migrations:
+          tokenid: ${CIRCLE_WORKFLOW_ID}  # to be used as token
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
 
   # cloudfront-update:
   #   docker: 
@@ -519,7 +518,7 @@ jobs:
   #         id: ${CIRCLE_WORKFLOW_ID:0:7}
   #         cond: on_fail 
   #     - revert-migrations:
-  #         workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
+  #         tokenid: ${CIRCLE_WORKFLOW_ID}  # to be used as token
   #         id: ${CIRCLE_WORKFLOW_ID:0:7}
   #         cond: on_fail
 
