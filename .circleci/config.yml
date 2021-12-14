@@ -481,7 +481,7 @@ jobs:
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/index.html"
             if curl -s ${URL} | grep "Welcome"  
             then
-              return 1
+              return 0
             else
               return 1
             fi
@@ -494,33 +494,33 @@ jobs:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail
 
-  # cloudfront-update:
-  #   docker: 
-  #     - image:  amazon/aws-cli 
-  #   steps:
-  #     # Checkout code from git
-  #     - checkout
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Update cloudfront distribution
-  #         command: |
-  #           aws cloudformation deploy \
-  #           --template-file .circleci/files/cloudfront.yml \
-  #           --stack-name InitialStack \
-  #           --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #           --tags project=udapeople
+  cloudfront-update:
+    docker: 
+      - image:  amazon/aws-cli 
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --stack-name InitialStack \
+            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --tags project=udapeople
 
-  #     # Here's where you will add some code to rollback on failure  
-  #     - destroy-environment:
-  #         id: ${CIRCLE_WORKFLOW_ID:0:7}
-  #         cond: on_fail 
-  #     - revert-migrations:
-  #         tokenid: ${CIRCLE_WORKFLOW_ID}  # to be used as token
-  #         id: ${CIRCLE_WORKFLOW_ID:0:7}
-  #         cond: on_fail
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail 
+      - revert-migrations:
+          tokenid: ${CIRCLE_WORKFLOW_ID}  # to be used as token
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
 
   # cleanup:
   #   docker:
