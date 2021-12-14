@@ -7,7 +7,7 @@
       remote_src: no
   
  
-  - name: "install dependencies nodejs npm"
+  - name: "install dependencies Nodejs NPM"
     become: yes
     apt:
       name: ["nodejs", "npm"]
@@ -15,7 +15,7 @@
       update_cache: yes    
           
   
-  - name: "Install netstat tool"
+  - name: "Install netstat tool - To check currently open ports"
     become: yes
     apt:
       name:  ["net-tools"]
@@ -29,17 +29,15 @@
       update_cache: yes
 
  
-  - name: "pm2 install global "
+  - name: "pm2 install global using NPM"
     become: yes
     shell: |
           cd /home/ubuntu/
           npm install pm2 -g
           
-  - name: "Start App"
+  - name: "Start Backend App : Check whether Port:3030 is Open"
     become: yes
-    # remote_user: ubuntu 
     become_user: ubuntu  
-    # command: 
     shell: | 
         cd /home/ubuntu/dist
         pm2 list 
@@ -49,21 +47,5 @@
         netstat -tulpn
         curl localhost:3030/api/status
         netstat -tulpn
-      # pm2 start npm -- start 
-      # export NODE_PATH=/home/ubuntu/dist/node_modules
-      # command: cd backend && pm2 start nodejs && pm2 start npm -- start --port 3030
     ignore_errors: true    
-    # environment:
-    #   NOD_ENV: production
-    #   ENVIRONMENT: production
-    #   NODE_PATH: /home/ubuntu/dist/node_modules
-    #   TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-    #   TYPEORM_MIGRATIONS_DIR: "./migrations"
-    #   TYPEORM_MIGRATIONS: "./migrations/*.js"
-    #   TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
-    #   TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-    #   TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-    #   TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-    #   TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-    #   TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-
+    

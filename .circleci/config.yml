@@ -15,6 +15,7 @@ commands:
           when: << parameters.cond >>
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
+            echo 'Backend Stack Deleted: ' udapeople-backend-<< parameters.id >>
           # exit 1
       - run:
           # first empty the bucket then delete the frontend stack else it will fail
@@ -22,7 +23,9 @@ commands:
           when: << parameters.cond >>
           command: |
             aws s3 rm s3://udapeople-<< parameters.id >> --recursive    
+            echo 'Frontend Bucket Emptied: ' udapeople-<< parameters.id >>
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
+            echo 'Frontend Stack Deleted: ' udapeople-<< parameters.id >>
           
           # exit 1      
   revert-migrations:
@@ -283,11 +286,6 @@ jobs:
             cd backend
             npm run migrations > migrations_dump.txt
             cat  migrations_dump.txt
-           
-          # npm install
-          # npm audit fix --audit-level=critical --force
-          # npm audit fix --force
-            
           # exit 1
       - run:
           name: Send migration results to memstash
@@ -301,8 +299,9 @@ jobs:
             fi
             
             export MEMSTASH_VALUE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
-            echo "${MEMSTASH_VALUE}"    
-            echo "workflow id is: " ${CIRCLE_WORKFLOW_ID:0:7}
+            
+            echo "Workflow id used as Token key is: ${CIRCLE_WORKFLOW_ID:0:7}"
+            echo "value stored at memstash is:  ${MEMSTASH_VALUE}"    
 
           # exit 1       
       # Here's where you will add some code to rollback on failure   
@@ -335,7 +334,7 @@ jobs:
             sudo ./aws/install
          
       - run:
-          name: Get backend url
+          name: Get Backend URL
           # your code here - Copied ec2 describe code from Deploy Infrastructure!
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances \
@@ -344,11 +343,11 @@ jobs:
               --output text)
   
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo  " API URL is: ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
             cat frontend/.env
       - run:
-          name: Deploy frontend objects
+          name: Deploy Frontend Objects
           # your code here
           command: |
             cd frontend
@@ -393,7 +392,7 @@ jobs:
             pip install awscli
 
       - run:
-          name: Install dependencies - Ansible, NPM
+          name: Install dependencies - Ansible, Nodejs, NPM
           command: |
             apk add --update ansible
             apk add --update nodejs
@@ -406,7 +405,7 @@ jobs:
             apk add --update tar                        
             apk add --update gzip
       - run:
-          name: Deploy backend
+          name: Deploy Backend
           # your code here
           command: |
             cd backend
@@ -434,13 +433,13 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml            
       
-      # Here's where you will add some code to rollback on failure  
-      # - revert-migrations:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail
-      # - destroy-environment:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail    
+      #Here's where you will add some code to rollback on failure  
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail    
  
   smoke-test:
     docker:
@@ -452,7 +451,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Install dependencies - Curl,awscli,ansible,npm,tar,gzib - Same as Deploy Backend
+          name: Install dependencies - Curl,AWSCLI, Ansible, NPM, tar, gzip - Same as Deploy Backend
           command: |
             apk add --update curl  
             pip install awscli
@@ -461,7 +460,7 @@ jobs:
             apk add --update tar                        
             apk add --update gzip
       - run:
-          name: Backend smoke test. 
+          name: Backend Smoke Test 
           #Get backend url (Same as Backend Deploy) and test it for ok status
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances \
@@ -478,7 +477,7 @@ jobs:
              return 1
             fi
       - run:
-          name: Frontend smoke test.
+          name: Frontend Smoke Test
           command: |
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/index.html"
             if curl -s ${URL} | grep "Welcome"  
@@ -487,13 +486,13 @@ jobs:
             else
               return 1
             fi
-      # Here's where you will add some code to rollback on failure  
-      # - revert-migrations:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail
-      # - destroy-environment:
-      #     id: ${CIRCLE_WORKFLOW_ID:0:7}
-      #     cond: on_fail     
+      #Here's where you will add some code to rollback on failure  
+      - revert-migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail
+      - destroy-environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          cond: on_fail     
     
 
   # cloudfront-update:
