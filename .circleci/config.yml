@@ -19,7 +19,7 @@ commands:
             aws s3 rm s3://udapeople-<< parameters.id >> --recursive    
             echo 'Frontend Bucket Emptied: ' udapeople-<< parameters.id >>
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
-            echo 'Frontend Stack Deleted: ' udapeople-<< parameters.id >>
+            echo 'Frontend Stack Deleted: ' udapeople-frontend-<< parameters.id >>
           # exit 1
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
