@@ -11,27 +11,22 @@ commands:
         type : string 
     steps:
       - run:
-          name: Destroy environments - Backend
+          name: Destroy environments - Backend & Frotend (Empty S3 bucket -then Destroy Frontend)
           when: << parameters.cond >>
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.id >>
             echo 'Backend Stack Deleted: ' udapeople-backend-<< parameters.id >>
-          # exit 1
-      - run:
-          # first empty the bucket then delete the frontend stack else it will fail
-          name: Destroy environments - Frontend 
-          when: << parameters.cond >>
-          command: |
             aws s3 rm s3://udapeople-<< parameters.id >> --recursive    
             echo 'Frontend Bucket Emptied: ' udapeople-<< parameters.id >>
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.id >>
             echo 'Frontend Stack Deleted: ' udapeople-<< parameters.id >>
-          
-          # exit 1      
+          # exit 1
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
       # Add parameter here 
+      workflow_token_id: 
+        type : string   
       id : 
         type : string   
       cond :
@@ -44,7 +39,9 @@ commands:
           # Add revert code here. You can find this in the Getting Started section.    
           when: << parameters.cond >> 
           command: |
-            export SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/migration_<< parameters.id >>)
+            export SUCCESS=$(curl -H "token: << parameters.workflow_token_id >>" --request GET https://api.memstash.io/values/migration_<< parameters.id >>)
+            
+            
             if(( $SUCCESS == 1 )); 
             then
               cd ~/project/backend
@@ -361,8 +358,9 @@ jobs:
       
       # Here's where you will add some code to rollback on failure 
       - revert-migrations:
+          workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
           id: ${CIRCLE_WORKFLOW_ID:0:7}
-          cond: on_fail    
+          cond: on_fail
       - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail    
@@ -435,6 +433,7 @@ jobs:
       
       #Here's where you will add some code to rollback on failure  
       - revert-migrations:
+          workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail
       - destroy-environment:
@@ -488,6 +487,7 @@ jobs:
             fi
       #Here's where you will add some code to rollback on failure  
       - revert-migrations:
+          workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           cond: on_fail
       - destroy-environment:
@@ -519,6 +519,7 @@ jobs:
   #         id: ${CIRCLE_WORKFLOW_ID:0:7}
   #         cond: on_fail 
   #     - revert-migrations:
+  #         workflow_token_id: ${CIRCLE_WORKFLOW_ID}  # to be used as token
   #         id: ${CIRCLE_WORKFLOW_ID:0:7}
   #         cond: on_fail
 
