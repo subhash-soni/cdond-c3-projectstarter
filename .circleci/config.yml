@@ -44,7 +44,7 @@ commands:
           # Add revert code here. You can find this in the Getting Started section.    
           when: << parameters.cond >> 
           command: |
-            SUCCESS = $(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/migration_<< parameters.id >>)
+            export SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/migration_<< parameters.id >>)
             if(( $SUCCESS == 1 )); 
             then
               cd ~/project/backend
@@ -300,8 +300,8 @@ jobs:
             
             export MEMSTASH_VALUE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
             
-            echo "Workflow id used as Token key is: ${CIRCLE_WORKFLOW_ID:0:7}"
-            echo "value stored at memstash is:  ${MEMSTASH_VALUE}"    
+            echo "Workflow id used as Token key  : ${CIRCLE_WORKFLOW_ID}"
+            echo "Value stored at memstash.io is :  ${MEMSTASH_VALUE}"    
 
           # exit 1       
       # Here's where you will add some code to rollback on failure   
